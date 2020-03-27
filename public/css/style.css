@@ -55,3 +55,60 @@ html, body {
     width: 20px;
     margin-right: 10px;
 }
+
+.main-home-logo {
+    padding-top: 4.5rem !important;
+    padding-bottom: 1.5rem !important;
+}
+
+.subtitle-center {
+    padding-left: 0.5em !important;
+    text-align: center !important;
+}
+
+.main-home-content-division {
+    margin-top: 1.5em !important;
+    border-radius: 10px;
+    height: 10px;
+}
+
+.main-home-content-title {
+    color: #33459d;
+    font-size: 17px;
+    opacity: 1;
+    text-align: left;
+    padding-left: 1em;
+}
+
+.main-home-search-input {
+    width: 60% !important;
+    display: inline-table;
+    margin-right: 2px;
+}
+
+.search-body {
+    margin-top: 3%;
+}
+
+.search-content {
+    position: relative;
+    margin-top: 3%;
+    padding-left: 7% !important;
+}
+
+.opportunity-card-content {
+    margin-top: 10px;
+}
+
+.opportunity-card-body {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+}
+
+.opportunities-pagination {
+    margin-top: 3%;
+    margin-left: 40% !important;
+}
