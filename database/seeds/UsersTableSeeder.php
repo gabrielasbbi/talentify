@@ -13,16 +13,16 @@ class UsersTableSeeder extends Seeder
     {
         $arrUsers = [
             [
-                'name' => 'Client',
-                'email' => "client-backend-test@talentify.com",
+                'name' => 'Client User',
+                'email' => "client-test@talentify.com",
                 'type' => 'client',
-                'password' => 'secret'
+                'password' => '$2y$10$j702KbD5lVHNOmxsEflohej9j8VsHCW01g53BRYKycsGrkgz0xknO' //secret123
             ],
             [
                 'name' => 'Admin',
                 'email' => "admin-backend-test@talentify.com",
                 'type' => 'admin',
-                'password' => 'secret'
+                'password' => '$2y$10$j702KbD5lVHNOmxsEflohej9j8VsHCW01g53BRYKycsGrkgz0xknO' //secret123
             ],
         ];
 

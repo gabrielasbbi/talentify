@@ -19,7 +19,7 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('dashboard');
 
-Route::post('/search', 'HomeController@search')->name('search');
+Route::post('/search', 'WelcomeController@search')->name('search');
 
 Route::get('/opportunities/{opportunityId}', 'OpportunitiesController@show')->name('opportunities.show');
 
