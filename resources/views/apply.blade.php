@@ -14,7 +14,7 @@
                             </div>
                         @endif
 
-                        Here will be listed de client applications.
+                        Here will be listed client's applications.
                     </div>
                 </div>
             </div>

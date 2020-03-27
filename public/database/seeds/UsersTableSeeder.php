@@ -20,7 +20,7 @@ class UsersTableSeeder extends Seeder
             ],
             [
                 'name' => 'Admin',
-                'email' => "admin-backend-test@talentify.com",
+                'email' => "admin-test@talentify.com",
                 'type' => 'admin',
                 'password' => '$2y$10$j702KbD5lVHNOmxsEflohej9j8VsHCW01g53BRYKycsGrkgz0xknO' //secret123
             ],

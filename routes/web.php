@@ -24,3 +24,20 @@ Route::post('/search', 'WelcomeController@search')->name('search');
 Route::get('/opportunities/{opportunityId}', 'OpportunitiesController@show')->name('opportunities.show');
 
 Route::get('/apply/{opportunityId}', 'HomeController@apply')->name('apply');
+
+Route::group(['namespace' => 'Admin', 'as' => 'admin.', 'prefix' => 'admin'], function() {
+
+    Route::group(['middleware' => 'role'], function() {
+        Route::get('/', 'AdminController@index')->name('home');
+        Route::get('/home', 'AdminController@index')->name('dashboard');
+        Route::post('/search', 'AdminController@search')->name('search');
+        Route::get('opportunity/{opportunityId}/show', 'AdminController@getShow');
+        Route::get('opportunity/{opportunityId}/edit', 'AdminController@getEdit');
+        Route::post('opportunity/{opportunityId}/edit', 'AdminController@postEdit');
+        Route::get('opportunity/{opportunityId}/delete', 'AdminController@getDelete');
+        Route::post('opportunity/{opportunityId}/delete', 'AdminController@postDelete');
+    });
+
+    Route::get('login', 'LoginController@showLogin')->name('showLogin');
+    Route::post('login', 'LoginController@login')->name('login');
+});
