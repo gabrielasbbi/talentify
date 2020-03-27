@@ -112,3 +112,22 @@ html, body {
     margin-top: 3%;
     margin-left: 40% !important;
 }
+
+.nav-opportunity {
+    margin-top: 1.5em !important;
+    border-radius: 10px;
+}
+
+.opportunity-title {
+    font-size: 35px;
+    margin-top: 2em;
+}
+
+.opportunity-content {
+    margin-top: 4em;
+}
+
+.opportunity-description {
+    margin-top: 2em;
+    text-align: justify;
+}

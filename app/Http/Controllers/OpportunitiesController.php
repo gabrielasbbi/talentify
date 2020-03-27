@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Opportunities;
 use Illuminate\Http\Request;
 
 class OpportunitiesController extends Controller
@@ -13,7 +14,7 @@ class OpportunitiesController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        //
     }
 
     /**
@@ -21,8 +22,10 @@ class OpportunitiesController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function show($id)
     {
-        return view('home');
+        $opportunity = Opportunities::findOrFail($id);
+
+        return view('opportunity', compact('opportunity'));
     }
 }

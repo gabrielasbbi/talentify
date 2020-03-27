@@ -17,8 +17,10 @@ Route::get('/', 'WelcomeController@index')->name('home');
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home', 'HomeController@index')->name('dashboard');
 
 Route::post('/search', 'HomeController@search')->name('search');
 
 Route::get('/opportunities/{opportunityId}', 'OpportunitiesController@show')->name('opportunities.show');
+
+Route::get('/apply/{opportunityId}', 'HomeController@apply')->name('apply');
