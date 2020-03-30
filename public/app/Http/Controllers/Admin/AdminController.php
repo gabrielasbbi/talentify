@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Opportunities;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
@@ -67,7 +68,7 @@ class AdminController extends Controller {
      *
      * @return Response
      */
-    public function store()
+    public function store(Request $request)
     {
         // Declare the rules for the form validation
         $rules = [
@@ -77,18 +78,20 @@ class AdminController extends Controller {
         ];
 
         // Validate the inputs
-        $validator = Validator::make(Input::all(), $rules);
+        $validator = Validator::make($request->all(), $rules);
 
         // Check if the form validates with success
         if ($validator->passes())
         {
 
             // Create a new opportunity
-            $this->opportunity->title       = Input::get('title');
-            $this->opportunity->description = Input::get('description');
-            $this->opportunity->status      = Input::get('status');
-            $this->opportunity->workplace   = Input::get('workplace');
-            $this->opportunity->salary      = Input::get('salary');
+            $salary = !is_null($request->input('salary')) ? floatval(str_replace(',', '.', str_replace('.', '', $request->input('salary')))) : null;
+
+            $this->opportunity->title       = $request->input('title');
+            $this->opportunity->description = $request->input('description');
+            $this->opportunity->status      = $request->input('status');
+            $this->opportunity->workplace   = $request->input('workplace');
+            $this->opportunity->salary      = $salary;
 
             // Was the opportunity created?
             if($this->opportunity->save())
@@ -143,9 +146,8 @@ class AdminController extends Controller {
      * @param $opportunity
      * @return Response
      */
-    public function postEdit($opportunity)
+    public function postEdit(Request $request, $id)
     {
-
         // Declare the rules for the form validation
         $rules = [
             'title'       => 'required|min:3',
@@ -154,17 +156,20 @@ class AdminController extends Controller {
         ];
 
         // Validate the inputs
-        $validator = Validator::make(Input::all(), $rules);
+        $validator = Validator::make($request->all(), $rules);
+
+        $opportunity = Opportunities::find($id);
 
         // Check if the form validates with success
         if ($validator->passes())
         {
-            // Update the blog post data
-            $this->opportunity->title       = Input::get('title');
-            $this->opportunity->description = Input::get('description');
-            $this->opportunity->status      = Input::get('status');
-            $this->opportunity->workplace   = Input::get('workplace');
-            $this->opportunity->salary      = Input::get('salary');
+            $salary = !is_null($request->input('salary')) ? floatval(str_replace(',', '.', str_replace('.', ',', $request->input('salary')))) : null;
+
+            $opportunity->title       = $request->input('title');
+            $opportunity->description = $request->input('description');
+            $opportunity->status      = $request->input('status');
+            $opportunity->workplace   = $request->input('workplace');
+            $opportunity->salary      = $salary;
 
             // Was the opportunity updated?
             if($opportunity->save())
@@ -201,36 +206,29 @@ class AdminController extends Controller {
      * @param $opportunity
      * @return Response
      */
-    public function postDelete($opportunity)
+    public function postDelete($id)
     {
         // Declare the rules for the form validation
         $rules = array(
             'id' => 'required|integer'
         );
 
-        // Validate the inputs
-        $validator = Validator::make(Input::all(), $rules);
 
-        // Check if the form validates with success
-        if ($validator->passes())
+        $opportunity = Opportunities::find($id);
+        $opportunity->delete();
+
+        // Was the opportunity deleted?
+        if(empty($opportunity))
         {
-            $id = $opportunity->id;
-            $opportunity->delete();
-
-            // Was the opportunity deleted?
-            $opportunity = Opportunities::find($id);
-
-            if(empty($opportunity))
-            {
-                // Redirect to the opportunities management page
-                return Redirect::to('admin/opportunities')->with([
-                    'error' => false,
-                    'errorMessage' => 'Job opportunity deleted with success!'
-                ]);
-            }
+            // Redirect to the opportunities management page
+            return Redirect::to('admin/opportunities')->with([
+                'error' => false,
+                'errorMessage' => 'Job opportunity deleted with success!'
+            ]);
         }
+
         // There was a problem deleting the opportunity
-        return Redirect::to('admin/opportunities')->with([
+        return Redirect::to('admin/')->with([
             'error' => true,
             'errorMessage', 'An error occurred while deleting the job opportunity.'
         ]);
