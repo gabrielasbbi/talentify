@@ -4,14 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Opportunities;
-use Illuminate\Auth\Events\Login;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\Paginator;
-use Spatie\Searchable\Search;
+use Yajra\DataTables\DataTables;
 
 class AdminController extends Controller {
-
 
     /**
      * Opportunities Model
@@ -35,14 +32,7 @@ class AdminController extends Controller {
      */
     public function index()
     {
-        // Grab all the opportunities
-        $opportunities = $this->opportunity;
-
-        $searchResults = $this->paginate((new Search())
-            ->registerModel(Opportunities::class, ['title', 'description', 'status', 'workplace', 'salary'])
-            ->search('active'));
-
-        return view('admin.home', compact('searchResults'));
+        return view('admin.home');
     }
 
     /**
@@ -51,29 +41,14 @@ class AdminController extends Controller {
      */
     public function search(Request $request)
     {
-        $searchResults = $this->paginate((new Search())
-            ->registerModel(Opportunities::class, ['title', 'description', 'status', 'workplace', 'salary'])
-            ->perform($request->input('query')));
+        return Datatables::of(Opportunities::query())
+            ->addColumn('actions', function($row) {
+                $editUrl = route('admin.opportunity.getEdit', $row->id);
+                $deleteUrl = route('admin.opportunity.postDelete', $row->id);
 
-        return view('admin.home', compact('searchResults'));
-    }
-
-    /**
-     * @param $items
-     * @param int $perPage
-     * @param null $page
-     * @param array $options
-     * @return LengthAwarePaginator
-     */
-    public function paginate($items, $perPage = 24, $page = null, $options = [])
-    {
-        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
-        $totalCount = count($items);
-        $pageItems= $items->forPage($page, $perPage);
-        $paginator = new LengthAwarePaginator($pageItems, $totalCount, $perPage, $page);
-
-        return $paginator;
-        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+                return view('layouts.formActions', compact('editUrl', 'deleteUrl'));
+            })
+            ->make(true);
     }
 
     /**
@@ -81,10 +56,10 @@ class AdminController extends Controller {
      *
      * @return Response
      */
-    public function getCreate()
+    public function create()
     {
         // Show the page
-        return View::make('admin/opportunities/create_edit');
+        return view('admin.opportunity.create_edit', ['title' => 'Create job opportunity', 'mode' => 'edit']);
     }
 
     /**
@@ -92,7 +67,7 @@ class AdminController extends Controller {
      *
      * @return Response
      */
-    public function postCreate()
+    public function store()
     {
         // Declare the rules for the form validation
         $rules = [
@@ -118,26 +93,29 @@ class AdminController extends Controller {
             if($this->opportunity->save())
             {
                 // Redirect to the new opportunity page
-                return Redirect::to('admin/opportunity/' . $this->opportunity->id . '/edit')->with('success', 'Job opportunity created with success!');
+                return Redirect::to('admin/opportunity/' . $this->opportunity->id . '/edit')->with([
+                    'title'   => 'Edit job opportunity',
+                    'mode'    => 'edit',
+                    'error'   => false,
+                    'errorMessage' => 'Job opportunity created with success!'
+                ]);
             }
 
             // Redirect to the opportunity create page
-            return Redirect::to('admin/opportunity/create')->with('error', 'An error occurred while creating a new job opportunity.');
+            return Redirect::to('admin/opportunity/create')->with([
+                'title'   => 'Edit job opportunity',
+                'mode'    => 'edit',
+                'error'   => true,
+                'errorMessage' => 'An error occurred while creating a new job opportunity.'
+            ]);
         }
 
         // Form validation failed
-        return Redirect::to('admin/opportunity/create')->withInput()->withErrors($validator);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param $opportunity
-     * @return Response
-     */
-    public function getShow($opportunity)
-    {
-        // redirect to the frontend
+        return Redirect::to('admin/opportunity/create')->with([
+            'title'   => 'Edit job opportunity',
+            'mode'    => 'edit',
+            'error'   => true
+        ])->withInput()->withErrors($validator);
     }
 
     /**
@@ -146,13 +124,16 @@ class AdminController extends Controller {
      * @param $opportunity
      * @return Response
      */
-    public function getEdit($opportunity)
+    public function getEdit($id)
     {
-        // Title
-        $title = Lang::get('admin/blogs/title.blog_update');
+        $opportunity = Opportunities::find($id);
 
         // Show the page
-        return View::make('admin/blogs/create_edit', 'Create job opportunity');
+        return view('admin.opportunity.create_edit', [
+            'title' => 'Edit job opportunity',
+            'mode' => 'edit',
+            'opportunity' => $opportunity
+        ]);
     }
 
     /**
@@ -188,26 +169,29 @@ class AdminController extends Controller {
             if($opportunity->save())
             {
                 // Redirect to the new opportunity page
-                return Redirect::to('admin/opportunity/' . $opportunity->id . '/edit')->with('success', 'Job opportunity edited with success!');
+                return Redirect::to('admin/opportunity/' . $opportunity->id . '/edit')->with([
+                    'title'   => 'Edit job opportunity',
+                    'mode'    => 'edit',
+                    'error'   => false,
+                    'errorMessage' => 'Job opportunity edited with success!'
+                ]);
             }
 
             // Redirect to the opportunity management page
-            return Redirect::to('admin/opportunity/' . $opportunity->id . '/edit')->with('error', 'An error occurred while editing the job opportunity.');
+            return Redirect::to('admin/opportunity/' . $opportunity->id . '/edit')->with([
+                'title'   => 'Edit job opportunity',
+                'mode'    => 'edit',
+                'error'   => true,
+                'errorMessage' => 'An error occurred while editing the job opportunity.'
+            ]);
         }
 
         // Form validation failed
-        return Redirect::to('admin/opportunity/' . $opportunity->id . '/edit')->withInput()->withErrors($validator);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param $opportunity
-     * @return Response
-     */
-    public function getDelete($opportunity)
-    {
-        return View::make('admin/opportunity/delete', 'Delete job opportunity');
+        return Redirect::to('admin/opportunity/' . $opportunity->id . '/edit')->with([
+            'title'   => 'Edit job opportunity',
+            'mode'    => 'edit',
+            'error'   => true
+        ])->withInput()->withErrors($validator);
     }
 
     /**
@@ -234,35 +218,20 @@ class AdminController extends Controller {
 
             // Was the opportunity deleted?
             $opportunity = Opportunities::find($id);
+
             if(empty($opportunity))
             {
                 // Redirect to the opportunities management page
-                return Redirect::to('admin/opportunities')->with('success', 'Job opportunity deleted with success!');
+                return Redirect::to('admin/opportunities')->with([
+                    'error' => false,
+                    'errorMessage' => 'Job opportunity deleted with success!'
+                ]);
             }
         }
         // There was a problem deleting the opportunity
-        return Redirect::to('admin/opportunities')->with('error', 'An error occurred while deleting the job opportunity.');
-    }
-
-    /**
-     * Show a list of all the opportunities formatted for Datatables.
-     *
-     * @return Datatables JSON
-     */
-    public function getData()
-    {
-        $opportunities = Opportunities::select(array('opportunities.id', 'opportunities.title', 'opportunities.description', 'opportunities.status', 'opportunities.workplace', 'opportunities.salary', 'posts.created_at'));
-
-        return Datatables::of($opportunities)
-            ->edit_column('created_at', '{{ $created_at->format("Y-m-d h:i:s") }}')
-            ->add_column('actions', '
-            <div class="btn-group">
-                <a href="{{{ URL::to(\'admin/opportunity/\' . $id . \'/edit\' ) }}}" class="btn btn-primary btn-xs iframe" ><i class="fa fa-pencil"></i> Edit </a>
-                <a href="{{{ URL::to(\'admin/opportunity/\' . $id . \'/delete\' ) }}}" class="btn btn-xs btn-danger iframe"><i class="fa fa-trash-o"></i> Delete </a>
-            </div>
-            ')
-            ->remove_column('id')
-            ->remove_column('rn') // rownum for oracle
-            ->make();
+        return Redirect::to('admin/opportunities')->with([
+            'error' => true,
+            'errorMessage', 'An error occurred while deleting the job opportunity.'
+        ]);
     }
 }

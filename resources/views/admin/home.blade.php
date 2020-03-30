@@ -1,60 +1,66 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="top-center position-ref full-height">
-        <div class="content">
+    <!-- Datatable -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.1/css/buttons.bootstrap4.min.css">
 
-            <div class="text-center">
-                <img src="{{asset("img/logotype.png")}}"/>
-            </div>
-            <div class="subtitle-center">
-                Recruitment Marketing on Autopilot
-            </div>
-
-            <div class="bg-light shadow-lg main-home-content-division">
-                <div class="col-md-12">
-                    <form action="{{ route('admin.search') }}" method="POST">
-                        @csrf
-                        <div class="form-group input-icons">
-                            <span class="fa fa-search"></span>
-                            <input type="text" class="form-control main-home-search-input" name="query" placeholder="Search for opportunities">
-                            <input type="submit" class="btn btn-md btn-primary pull-right" value="Search" />
-                        </div>
-                    </form>
-                </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 pull-right">
+                <a href="{{route('admin.opportunity.create')}}" class="btn btn-primary btn-sm" role="button" aria-pressed="true"><i class="fa fa-plus"></i>&nbsp; New opportunity</a>
             </div>
         </div>
-
-        <div class="container content search-body">
-            <div class="">
-                <b>Showing {{ $searchResults->count() }} opportunities
-                    @if( request('query') )
-                        for "{{ request('query') }}"
-                    @endif
-                </b>
-            </div>
-
-            <div class="container content search-content row">
-                @foreach($searchResults->groupByType() as $type => $modelSearchResults)
-                    @foreach($modelSearchResults as $searchResult)
-                        <div class="col-md-4 float-left opportunity-card-content">
-                            <div class="card" style="width: 18rem;">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $searchResult->title }}</h5>
-                                    <h6 class="card-subtitle mb-2 text-muted">${{ $searchResult->searchable->salary }}/year</h6>
-                                    <p class="card-text opportunity-card-body">{{ $searchResult->searchable->description }}</p>
-                                    <a href="{{ $searchResult->url }}" class="card-link btn btn-md btn-primary">View job</a>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                @endforeach
-            </div>
-        </div>
-        <div class="container content opportunities-pagination row">
-            <div class="col-md-12">
-                {{$searchResults->render()}}
-            </div>
+        <div class="dashboard-main-table">
+            <table id="table" class="table table-striped table-bordered wrap" style="width:100%">
+                <thead>
+                <tr>
+                    <th>Job title</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Workplace</th>
+                    <th>Salary</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+            </table>
         </div>
     </div>
+
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" defer></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" defer></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js" defer></script>
+
+    <script>
+        $(document).ready(function() {
+            $('.table').DataTable({
+                columnDefs: [
+                    {
+                        targets: -1,
+                        className: 'dt-body-right'
+                    }
+                ],
+                processing: true,
+                serverSide: true,
+                ajax: '{{ route('admin.opportunity.search') }}',
+                columns: [
+                    { data: 'title', name: 'title' },
+                    { data: 'description', name: 'description' },
+                    { data: 'status', name: 'status' },
+                    { data: 'workplace', name: 'workplace' },
+                    { data: 'salary', function(data) {
+                        return '$'+ data;
+                        }
+                    },
+                    { data: 'actions',
+                        render: function(data){
+                            return htmlDecode(data);
+                        }
+                    }
+                ]
+            });
+            $.fn.dataTable.ext.errMode = 'throw';
+        });
+    </script>
 @endsection

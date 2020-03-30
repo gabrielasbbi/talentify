@@ -49,6 +49,13 @@ class WelcomeController extends Controller
         return view('welcome', compact('searchResults'));
     }
 
+    /**
+     * @param $items
+     * @param int $perPage
+     * @param null $page
+     * @param array $options
+     * @return LengthAwarePaginator
+     */
     public function paginate($items, $perPage = 24, $page = null, $options = [])
     {
         $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);

@@ -64,4 +64,15 @@ class LoginController extends Controller
 
         return redirect('admin/login')->with('loginError', 'Permission Denied! You do not have administrative access.');
     }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function logout(Request $request)
+    {
+        Session::forget('url.intented');
+
+        return redirect('admin/login');
+    }
 }
