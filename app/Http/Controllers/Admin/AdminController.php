@@ -82,6 +82,7 @@ class AdminController extends Controller {
         // Check if the form validates with success
         if ($validator->passes())
         {
+
             // Create a new opportunity
             $this->opportunity->title       = Input::get('title');
             $this->opportunity->description = Input::get('description');
